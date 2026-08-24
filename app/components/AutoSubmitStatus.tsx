@@ -28,7 +28,11 @@ function StatusSelect({
       className={`rounded-md border px-2 py-1 text-sm font-medium disabled:opacity-50 ${colors.bg} ${colors.text} ${colors.border}`}
     >
       {STATUS_OPTIONS.map((status) => (
-        <option key={status} value={status}>
+        <option
+          key={status}
+          value={status}
+          style={{ backgroundColor: "var(--surface)", color: "var(--foreground)" }}
+        >
           {status}
         </option>
       ))}

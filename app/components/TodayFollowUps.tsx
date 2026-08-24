@@ -2,6 +2,7 @@ import type { Lead } from "@/lib/types";
 import { formatDateTimeHe, isOverdue } from "@/lib/date";
 import AutoSubmitFollowUpAt from "./AutoSubmitFollowUpAt";
 import AutoSubmitStatus from "./AutoSubmitStatus";
+import CopyButton from "./CopyButton";
 import LeadFormDialog from "./LeadFormDialog";
 
 export default function TodayFollowUps({ leads }: { leads: Lead[] }) {
@@ -39,7 +40,10 @@ export default function TodayFollowUps({ leads }: { leads: Lead[] }) {
                     }
                   />
                   {lead.phone && (
-                    <div className="text-sm text-muted">{lead.phone}</div>
+                    <div className="text-sm text-muted inline-flex items-center gap-1.5">
+                      {lead.phone}
+                      <CopyButton value={lead.phone} />
+                    </div>
                   )}
                 </div>
 

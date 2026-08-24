@@ -4,6 +4,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useTransition } from "react";
 import { INTEREST_OPTIONS, STATUS_OPTIONS } from "@/lib/types";
 
+const optionStyle = { backgroundColor: "var(--surface)", color: "var(--foreground)" };
+
 export default function FilterBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,9 +50,9 @@ export default function FilterBar() {
         onChange={(event) => updateParam("status", event.target.value)}
         className="rounded-lg border border-border px-3 py-2 text-sm bg-surface"
       >
-        <option value="">כל הסטטוסים</option>
+        <option value="" style={optionStyle}>כל הסטטוסים</option>
         {STATUS_OPTIONS.map((status) => (
-          <option key={status} value={status}>
+          <option key={status} value={status} style={optionStyle}>
             {status}
           </option>
         ))}
@@ -61,9 +63,9 @@ export default function FilterBar() {
         onChange={(event) => updateParam("source", event.target.value)}
         className="rounded-lg border border-border px-3 py-2 text-sm bg-surface"
       >
-        <option value="">כל מה שמעוניינים בו</option>
+        <option value="" style={optionStyle}>כל מה שמעוניינים בו</option>
         {INTEREST_OPTIONS.map((option) => (
-          <option key={option} value={option}>
+          <option key={option} value={option} style={optionStyle}>
             {option}
           </option>
         ))}
@@ -74,10 +76,10 @@ export default function FilterBar() {
         onChange={(event) => updateParam("sort", event.target.value)}
         className="rounded-lg border border-border px-3 py-2 text-sm bg-surface"
       >
-        <option value="follow_up_asc">מיון: מועד חזרה (קרוב קודם)</option>
-        <option value="follow_up_desc">מיון: מועד חזרה (רחוק קודם)</option>
-        <option value="created_desc">מיון: נוצר לאחרונה</option>
-        <option value="name_asc">מיון: שם</option>
+        <option value="follow_up_asc" style={optionStyle}>מיון: מועד חזרה (קרוב קודם)</option>
+        <option value="follow_up_desc" style={optionStyle}>מיון: מועד חזרה (רחוק קודם)</option>
+        <option value="created_desc" style={optionStyle}>מיון: נוצר לאחרונה</option>
+        <option value="name_asc" style={optionStyle}>מיון: שם</option>
       </select>
     </div>
   );

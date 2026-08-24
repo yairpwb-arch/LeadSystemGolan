@@ -2,6 +2,7 @@ import type { Lead } from "@/lib/types";
 import { isOverdue } from "@/lib/date";
 import AutoSubmitFollowUpAt from "./AutoSubmitFollowUpAt";
 import AutoSubmitStatus from "./AutoSubmitStatus";
+import CopyButton from "./CopyButton";
 import DeleteLeadButton from "./DeleteLeadButton";
 import LeadFormDialog from "./LeadFormDialog";
 
@@ -49,9 +50,25 @@ export default function LeadsTable({ leads }: { leads: Lead[] }) {
                     }
                   />
                 </td>
-                <td className="p-3 whitespace-nowrap">{lead.phone ?? "—"}</td>
                 <td className="p-3 whitespace-nowrap">
-                  {lead.customer_number ?? "—"}
+                  {lead.phone ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      {lead.phone}
+                      <CopyButton value={lead.phone} />
+                    </span>
+                  ) : (
+                    "—"
+                  )}
+                </td>
+                <td className="p-3 whitespace-nowrap">
+                  {lead.customer_number ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      {lead.customer_number}
+                      <CopyButton value={lead.customer_number} />
+                    </span>
+                  ) : (
+                    "—"
+                  )}
                 </td>
                 <td className="p-3 whitespace-nowrap">{lead.source ?? "—"}</td>
                 <td className="p-3">
