@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useRef } from "react";
-import { SOURCE_OPTIONS, STATUS_OPTIONS } from "@/lib/types";
+import { useRef, useTransition } from "react";
+import { INTEREST_OPTIONS, STATUS_OPTIONS } from "@/lib/types";
 
 export default function FilterBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   function updateParam(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -16,7 +17,7 @@ export default function FilterBar() {
     } else {
       params.delete(key);
     }
-    router.push(`/?${params.toString()}`);
+    startTransition(() => router.push(`/?${params.toString()}`));
   }
 
   function onSearchChange(value: string) {
@@ -26,13 +27,21 @@ export default function FilterBar() {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <input
-        type="search"
-        placeholder="חיפוש לפי שם או טלפון..."
-        defaultValue={searchParams.get("search") ?? ""}
-        onChange={(event) => onSearchChange(event.target.value)}
-        className="flex-1 min-w-[180px] rounded-lg border border-border px-3 py-2 text-sm"
-      />
+      <div className="relative flex-1 min-w-[180px]">
+        <input
+          type="search"
+          placeholder="חיפוש לפי שם או טלפון..."
+          defaultValue={searchParams.get("search") ?? ""}
+          onChange={(event) => onSearchChange(event.target.value)}
+          className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+        />
+        {isPending && (
+          <span
+            aria-hidden="true"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 rounded-full border-2 border-muted border-t-transparent animate-spin"
+          />
+        )}
+      </div>
 
       <select
         defaultValue={searchParams.get("status") ?? ""}
@@ -52,10 +61,10 @@ export default function FilterBar() {
         onChange={(event) => updateParam("source", event.target.value)}
         className="rounded-lg border border-border px-3 py-2 text-sm bg-surface"
       >
-        <option value="">כל המקורות</option>
-        {SOURCE_OPTIONS.map((source) => (
-          <option key={source} value={source}>
-            {source}
+        <option value="">כל מה שמעוניינים בו</option>
+        {INTEREST_OPTIONS.map((option) => (
+          <option key={option} value={option}>
+            {option}
           </option>
         ))}
       </select>
@@ -65,8 +74,8 @@ export default function FilterBar() {
         onChange={(event) => updateParam("sort", event.target.value)}
         className="rounded-lg border border-border px-3 py-2 text-sm bg-surface"
       >
-        <option value="follow_up_asc">מיון: תאריך מעקב (קרוב קודם)</option>
-        <option value="follow_up_desc">מיון: תאריך מעקב (רחוק קודם)</option>
+        <option value="follow_up_asc">מיון: מועד חזרה (קרוב קודם)</option>
+        <option value="follow_up_desc">מיון: מועד חזרה (רחוק קודם)</option>
         <option value="created_desc">מיון: נוצר לאחרונה</option>
         <option value="name_asc">מיון: שם</option>
       </select>

@@ -1,6 +1,6 @@
 import type { Lead } from "@/lib/types";
 import { isOverdue } from "@/lib/date";
-import AutoSubmitDate from "./AutoSubmitDate";
+import AutoSubmitFollowUpAt from "./AutoSubmitFollowUpAt";
 import AutoSubmitStatus from "./AutoSubmitStatus";
 import DeleteLeadButton from "./DeleteLeadButton";
 import LeadFormDialog from "./LeadFormDialog";
@@ -21,16 +21,17 @@ export default function LeadsTable({ leads }: { leads: Lead[] }) {
           <tr className="border-b border-border text-start text-muted">
             <th className="p-3 text-start font-medium">שם</th>
             <th className="p-3 text-start font-medium">טלפון</th>
-            <th className="p-3 text-start font-medium">מקור</th>
+            <th className="p-3 text-start font-medium">מס&apos; לקוח</th>
+            <th className="p-3 text-start font-medium">מעוניין</th>
             <th className="p-3 text-start font-medium">סטטוס</th>
-            <th className="p-3 text-start font-medium">תאריך מעקב</th>
+            <th className="p-3 text-start font-medium">מתי לחזור אליו</th>
             <th className="p-3 text-start font-medium">הערות</th>
             <th className="p-3 text-start font-medium"></th>
           </tr>
         </thead>
         <tbody>
           {leads.map((lead) => {
-            const overdue = isOverdue(lead.follow_up_date);
+            const overdue = isOverdue(lead.follow_up_at);
             return (
               <tr
                 key={lead.id}
@@ -49,15 +50,23 @@ export default function LeadsTable({ leads }: { leads: Lead[] }) {
                   />
                 </td>
                 <td className="p-3 whitespace-nowrap">{lead.phone ?? "—"}</td>
+                <td className="p-3 whitespace-nowrap">
+                  {lead.customer_number ?? "—"}
+                </td>
                 <td className="p-3 whitespace-nowrap">{lead.source ?? "—"}</td>
                 <td className="p-3">
-                  <AutoSubmitStatus leadId={lead.id} value={lead.status} />
+                  <AutoSubmitStatus
+                    key={`${lead.id}:${lead.status}`}
+                    leadId={lead.id}
+                    value={lead.status}
+                  />
                 </td>
                 <td className="p-3">
                   <div className="flex items-center gap-2">
-                    <AutoSubmitDate
+                    <AutoSubmitFollowUpAt
+                      key={`${lead.id}:${lead.follow_up_at}`}
                       leadId={lead.id}
-                      value={lead.follow_up_date}
+                      value={lead.follow_up_at}
                     />
                     {overdue && (
                       <span className="text-danger text-xs font-medium">

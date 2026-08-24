@@ -1,4 +1,5 @@
 import { loginAction } from "@/lib/actions";
+import SubmitButton from "@/app/components/SubmitButton";
 
 export const dynamic = "force-dynamic";
 
@@ -38,12 +39,12 @@ export default async function LoginPage(props: PageProps<"/login">) {
             </p>
           )}
 
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="מתחבר..."
             className="w-full rounded-lg bg-brand px-3 py-2 text-white font-medium hover:bg-brand-hover transition-colors"
           >
             כניסה
-          </button>
+          </SubmitButton>
         </form>
       </div>
     </main>

@@ -1,4 +1,8 @@
-import type { LeadStats } from "@/lib/types";
+import { STATUS_COLORS, type LeadStats, type LeadStatus } from "@/lib/types";
+
+function dotColor(status: string): string {
+  return STATUS_COLORS[status as LeadStatus]?.dot ?? "bg-slate-400";
+}
 
 export default function StatsBar({ stats }: { stats: LeadStats }) {
   const tiles = [
@@ -38,6 +42,10 @@ export default function StatsBar({ stats }: { stats: LeadStats }) {
                 key={row.status}
                 className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-sm"
               >
+                <span
+                  aria-hidden="true"
+                  className={`h-2 w-2 rounded-full ${dotColor(row.status)}`}
+                />
                 <span>{row.status}</span>
                 <span className="text-muted">{row.count}</span>
               </span>

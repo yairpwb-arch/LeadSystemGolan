@@ -43,14 +43,18 @@ function ensureSchema(): Promise<void> {
           full_name TEXT NOT NULL,
           phone TEXT,
           source TEXT,
-          status TEXT NOT NULL DEFAULT 'חדש',
-          follow_up_date DATE,
+          status TEXT NOT NULL DEFAULT 'נקבעה שיחה',
           notes TEXT,
           created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
           updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
         )
       `;
-      await sql`CREATE INDEX IF NOT EXISTS leads_follow_up_date_idx ON leads (follow_up_date)`;
+      // מיגרציות תוספתיות ואידמפוטנטיות - בטוחות להרצה חוזרת בכל cold start
+      await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS customer_number TEXT`;
+      await sql`ALTER TABLE leads ADD COLUMN IF NOT EXISTS follow_up_at TIMESTAMP`;
+      await sql`ALTER TABLE leads DROP COLUMN IF EXISTS follow_up_date`;
+      await sql`ALTER TABLE leads ALTER COLUMN status SET DEFAULT 'נקבעה שיחה'`;
+      await sql`CREATE INDEX IF NOT EXISTS leads_follow_up_at_idx ON leads (follow_up_at)`;
       await sql`CREATE INDEX IF NOT EXISTS leads_status_idx ON leads (status)`;
     })();
   }
@@ -63,16 +67,16 @@ export async function getTodayFollowUps(): Promise<Lead[]> {
   const today = todayISODate();
   const rows = await sql<Lead[]>`
     SELECT
-      id, full_name, phone, source, status,
-      follow_up_date::text AS follow_up_date,
+      id, full_name, phone, customer_number, source, status,
+      follow_up_at::text AS follow_up_at,
       notes,
       created_at::text AS created_at,
       updated_at::text AS updated_at
     FROM leads
-    WHERE follow_up_date IS NOT NULL
-      AND follow_up_date <= ${today}::date
+    WHERE follow_up_at IS NOT NULL
+      AND follow_up_at::date <= ${today}::date
       AND status NOT IN ('לא רלוונטי', 'נסגר-לקוח')
-    ORDER BY follow_up_date ASC, created_at ASC
+    ORDER BY follow_up_at ASC
   `;
   return rows;
 }
@@ -86,9 +90,9 @@ export async function getStats(): Promise<LeadStats> {
   >`
     SELECT
       COUNT(*) AS total,
-      COUNT(*) FILTER (WHERE follow_up_date = ${today}::date) AS due_today,
+      COUNT(*) FILTER (WHERE follow_up_at::date = ${today}::date) AS due_today,
       COUNT(*) FILTER (
-        WHERE follow_up_date < ${today}::date
+        WHERE follow_up_at::date < ${today}::date
         AND status NOT IN ('לא רלוונטי', 'נסגר-לקוח')
       ) AS overdue
     FROM leads
@@ -117,17 +121,17 @@ export async function getAllLeads(filters: LeadFilters): Promise<Lead[]> {
 
   const orderBy =
     sort === "follow_up_desc"
-      ? sql`ORDER BY follow_up_date DESC NULLS LAST, created_at DESC`
+      ? sql`ORDER BY follow_up_at DESC NULLS LAST, created_at DESC`
       : sort === "created_desc"
         ? sql`ORDER BY created_at DESC`
         : sort === "name_asc"
           ? sql`ORDER BY full_name ASC`
-          : sql`ORDER BY follow_up_date ASC NULLS LAST, created_at DESC`;
+          : sql`ORDER BY follow_up_at ASC NULLS LAST, created_at DESC`;
 
   const rows = await sql<Lead[]>`
     SELECT
-      id, full_name, phone, source, status,
-      follow_up_date::text AS follow_up_date,
+      id, full_name, phone, customer_number, source, status,
+      follow_up_at::text AS follow_up_at,
       notes,
       created_at::text AS created_at,
       updated_at::text AS updated_at
@@ -141,18 +145,19 @@ export async function getAllLeads(filters: LeadFilters): Promise<Lead[]> {
 export interface NewLeadInput {
   full_name: string;
   phone: string | null;
+  customer_number: string | null;
   source: string | null;
-  status: string;
-  follow_up_date: string | null;
+  follow_up_at: string | null;
   notes: string | null;
 }
 
 export async function createLead(input: NewLeadInput): Promise<void> {
   await ensureSchema();
   const sql = getSql();
+  // status לא מוזכר בכוונה - עמודת ה-DB מפילה אותו אוטומטית ל-DEFAULT ('נקבעה שיחה')
   await sql`
-    INSERT INTO leads (full_name, phone, source, status, follow_up_date, notes)
-    VALUES (${input.full_name}, ${input.phone}, ${input.source}, ${input.status}, ${input.follow_up_date}, ${input.notes})
+    INSERT INTO leads (full_name, phone, customer_number, source, follow_up_at, notes)
+    VALUES (${input.full_name}, ${input.phone}, ${input.customer_number}, ${input.source}, ${input.follow_up_at}, ${input.notes})
   `;
 }
 
@@ -162,27 +167,28 @@ export async function updateLead(
 ): Promise<void> {
   await ensureSchema();
   const sql = getSql();
+  // status לא נכלל בכוונה - נשמר כפי שהוא, עדכון סטטוס נעשה רק דרך updateStatus
   await sql`
     UPDATE leads SET
       full_name = ${input.full_name},
       phone = ${input.phone},
+      customer_number = ${input.customer_number},
       source = ${input.source},
-      status = ${input.status},
-      follow_up_date = ${input.follow_up_date},
+      follow_up_at = ${input.follow_up_at},
       notes = ${input.notes},
       updated_at = now()
     WHERE id = ${id}
   `;
 }
 
-export async function updateFollowUpDate(
+export async function updateFollowUpAt(
   id: number,
-  followUpDate: string | null
+  followUpAt: string | null
 ): Promise<void> {
   await ensureSchema();
   const sql = getSql();
   await sql`
-    UPDATE leads SET follow_up_date = ${followUpDate}, updated_at = now()
+    UPDATE leads SET follow_up_at = ${followUpAt}, updated_at = now()
     WHERE id = ${id}
   `;
 }

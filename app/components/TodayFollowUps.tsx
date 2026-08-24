@@ -1,6 +1,6 @@
 import type { Lead } from "@/lib/types";
-import { formatDateHe, isOverdue } from "@/lib/date";
-import AutoSubmitDate from "./AutoSubmitDate";
+import { formatDateTimeHe, isOverdue } from "@/lib/date";
+import AutoSubmitFollowUpAt from "./AutoSubmitFollowUpAt";
 import AutoSubmitStatus from "./AutoSubmitStatus";
 import LeadFormDialog from "./LeadFormDialog";
 
@@ -21,7 +21,7 @@ export default function TodayFollowUps({ leads }: { leads: Lead[] }) {
       ) : (
         <ul className="divide-y divide-border">
           {leads.map((lead) => {
-            const overdue = isOverdue(lead.follow_up_date);
+            const overdue = isOverdue(lead.follow_up_at);
             return (
               <li
                 key={lead.id}
@@ -47,11 +47,19 @@ export default function TodayFollowUps({ leads }: { leads: Lead[] }) {
                   className={`text-sm ${overdue ? "text-danger font-medium" : "text-muted"}`}
                 >
                   {overdue ? "באיחור מ־" : "נקבע ל־"}
-                  {formatDateHe(lead.follow_up_date)}
+                  {formatDateTimeHe(lead.follow_up_at)}
                 </span>
 
-                <AutoSubmitStatus leadId={lead.id} value={lead.status} />
-                <AutoSubmitDate leadId={lead.id} value={lead.follow_up_date} />
+                <AutoSubmitStatus
+                  key={`${lead.id}:${lead.status}`}
+                  leadId={lead.id}
+                  value={lead.status}
+                />
+                <AutoSubmitFollowUpAt
+                  key={`${lead.id}:${lead.follow_up_at}`}
+                  leadId={lead.id}
+                  value={lead.follow_up_at}
+                />
               </li>
             );
           })}

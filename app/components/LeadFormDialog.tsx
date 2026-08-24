@@ -2,7 +2,9 @@
 
 import { useRef } from "react";
 import { createLeadAction, updateLeadAction } from "@/lib/actions";
-import { SOURCE_OPTIONS, STATUS_OPTIONS, type Lead } from "@/lib/types";
+import { INTEREST_OPTIONS, type Lead } from "@/lib/types";
+import { toDatetimeLocalValue } from "@/lib/date";
+import SubmitButton from "./SubmitButton";
 
 export default function LeadFormDialog({
   lead,
@@ -22,7 +24,6 @@ export default function LeadFormDialog({
       <dialog
         ref={dialogRef}
         className="w-full max-w-md rounded-2xl border border-border bg-surface p-0 backdrop:bg-black/40"
-        onClose={(event) => event.stopPropagation()}
       >
         <form
           action={async (formData) => {
@@ -42,67 +43,68 @@ export default function LeadFormDialog({
             <input
               name="full_name"
               required
+              autoFocus
               defaultValue={lead?.full_name ?? ""}
               className="w-full rounded-lg border border-border px-3 py-2"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-muted mb-1">טלפון</label>
+            <label className="block text-sm text-muted mb-1">מספר טלפון</label>
             <input
               name="phone"
+              type="tel"
+              required
               defaultValue={lead?.phone ?? ""}
               className="w-full rounded-lg border border-border px-3 py-2"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm text-muted mb-1">מקור</label>
-              <select
-                name="source"
-                defaultValue={lead?.source ?? ""}
-                className="w-full rounded-lg border border-border px-3 py-2 bg-surface"
-              >
-                <option value="">בחרו מקור</option>
-                {SOURCE_OPTIONS.map((source) => (
-                  <option key={source} value={source}>
-                    {source}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm text-muted mb-1">סטטוס</label>
-              <select
-                name="status"
-                defaultValue={lead?.status ?? STATUS_OPTIONS[0]}
-                className="w-full rounded-lg border border-border px-3 py-2 bg-surface"
-              >
-                {STATUS_OPTIONS.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
           <div>
             <label className="block text-sm text-muted mb-1">
-              תאריך מעקב הבא
+              מספר לקוח <span className="text-muted">(אופציונלי)</span>
             </label>
             <input
-              type="date"
-              name="follow_up_date"
-              defaultValue={lead?.follow_up_date ?? ""}
+              name="customer_number"
+              defaultValue={lead?.customer_number ?? ""}
               className="w-full rounded-lg border border-border px-3 py-2"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-muted mb-1">הערות</label>
+            <label className="block text-sm text-muted mb-1">
+              מתי לחזור אליו
+            </label>
+            <input
+              type="datetime-local"
+              name="follow_up_at"
+              required
+              defaultValue={toDatetimeLocalValue(lead?.follow_up_at ?? null)}
+              className="w-full rounded-lg border border-border px-3 py-2"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-muted mb-1">מעוניין</label>
+            <select
+              name="source"
+              required
+              defaultValue={lead?.source ?? ""}
+              className="w-full rounded-lg border border-border px-3 py-2 bg-surface"
+            >
+              <option value="" disabled>
+                בחרו
+              </option>
+              {INTEREST_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm text-muted mb-1">הערה</label>
             <textarea
               name="notes"
               rows={3}
@@ -119,12 +121,12 @@ export default function LeadFormDialog({
             >
               ביטול
             </button>
-            <button
-              type="submit"
+            <SubmitButton
+              pendingText={isEdit ? "שומר..." : "מוסיף..."}
               className="rounded-lg bg-brand px-4 py-2 text-sm text-white font-medium hover:bg-brand-hover"
             >
               {isEdit ? "שמירה" : "הוספת ליד"}
-            </button>
+            </SubmitButton>
           </div>
         </form>
       </dialog>

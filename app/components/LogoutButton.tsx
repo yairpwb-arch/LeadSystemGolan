@@ -1,14 +1,15 @@
 import { logoutAction } from "@/lib/actions";
+import SubmitButton from "./SubmitButton";
 
 export default function LogoutButton() {
   return (
     <form action={logoutAction}>
-      <button
-        type="submit"
+      <SubmitButton
+        pendingText="מתנתק..."
         className="text-sm text-muted hover:text-foreground"
       >
         התנתקות
-      </button>
+      </SubmitButton>
     </form>
   );
 }

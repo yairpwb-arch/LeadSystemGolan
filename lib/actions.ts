@@ -12,7 +12,7 @@ import {
 import {
   createLead,
   deleteLead,
-  updateFollowUpDate,
+  updateFollowUpAt,
   updateLead,
   updateStatus,
   type NewLeadInput,
@@ -47,9 +47,9 @@ export async function logoutAction(): Promise<void> {
 function readLeadForm(formData: FormData): NewLeadInput {
   const full_name = String(formData.get("full_name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
+  const customer_number = String(formData.get("customer_number") ?? "").trim();
   const source = String(formData.get("source") ?? "").trim();
-  const status = String(formData.get("status") ?? STATUS_OPTIONS[0]).trim();
-  const follow_up_date = String(formData.get("follow_up_date") ?? "").trim();
+  const follow_up_at = String(formData.get("follow_up_at") ?? "").trim();
   const notes = String(formData.get("notes") ?? "").trim();
 
   if (!full_name) {
@@ -59,11 +59,9 @@ function readLeadForm(formData: FormData): NewLeadInput {
   return {
     full_name,
     phone: phone || null,
+    customer_number: customer_number || null,
     source: source || null,
-    status: (STATUS_OPTIONS as readonly string[]).includes(status)
-      ? status
-      : STATUS_OPTIONS[0],
-    follow_up_date: follow_up_date || null,
+    follow_up_at: follow_up_at || null,
     notes: notes || null,
   };
 }
@@ -82,13 +80,13 @@ export async function updateLeadAction(formData: FormData): Promise<void> {
   revalidatePath("/");
 }
 
-export async function quickUpdateFollowUpDateAction(
+export async function quickUpdateFollowUpAtAction(
   formData: FormData
 ): Promise<void> {
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) throw new Error("מזהה ליד לא תקין");
-  const followUpDate = String(formData.get("follow_up_date") ?? "").trim();
-  await updateFollowUpDate(id, followUpDate || null);
+  const followUpAt = String(formData.get("follow_up_at") ?? "").trim();
+  await updateFollowUpAt(id, followUpAt || null);
   revalidatePath("/");
 }
 

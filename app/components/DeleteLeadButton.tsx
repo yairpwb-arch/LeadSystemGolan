@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteLeadAction } from "@/lib/actions";
+import SubmitButton from "./SubmitButton";
 
 export default function DeleteLeadButton({ leadId }: { leadId: number }) {
   return (
@@ -14,12 +15,9 @@ export default function DeleteLeadButton({ leadId }: { leadId: number }) {
       className="inline-flex"
     >
       <input type="hidden" name="id" value={leadId} />
-      <button
-        type="submit"
-        className="text-sm text-danger hover:underline"
-      >
+      <SubmitButton pendingText="מוחק..." className="text-sm text-danger hover:underline">
         מחיקה
-      </button>
+      </SubmitButton>
     </form>
   );
 }
