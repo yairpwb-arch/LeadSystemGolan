@@ -26,33 +26,33 @@ export const STATUS_COLORS: Record<
   { bg: string; text: string; border: string; dot: string }
 > = {
   "נקבעה שיחה": {
-    bg: "bg-blue-50",
-    text: "text-blue-700",
-    border: "border-blue-300",
+    bg: "bg-blue-500/15",
+    text: "text-blue-300",
+    border: "border-blue-500/40",
     dot: "bg-blue-500",
   },
   "מתלבט": {
-    bg: "bg-amber-50",
-    text: "text-amber-700",
-    border: "border-amber-300",
+    bg: "bg-amber-500/15",
+    text: "text-amber-300",
+    border: "border-amber-500/40",
     dot: "bg-amber-500",
   },
   "אין מענה": {
-    bg: "bg-orange-50",
-    text: "text-orange-700",
-    border: "border-orange-300",
+    bg: "bg-orange-500/15",
+    text: "text-orange-300",
+    border: "border-orange-500/40",
     dot: "bg-orange-500",
   },
   "לא רלוונטי": {
-    bg: "bg-slate-100",
-    text: "text-slate-600",
-    border: "border-slate-300",
+    bg: "bg-slate-500/15",
+    text: "text-slate-300",
+    border: "border-slate-500/40",
     dot: "bg-slate-400",
   },
   "נסגר-לקוח": {
-    bg: "bg-green-50",
-    text: "text-green-700",
-    border: "border-green-300",
+    bg: "bg-green-500/15",
+    text: "text-green-300",
+    border: "border-green-500/40",
     dot: "bg-green-500",
   },
 };

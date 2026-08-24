@@ -23,7 +23,7 @@ export default function LeadFormDialog({
 
       <dialog
         ref={dialogRef}
-        className="w-full max-w-md rounded-2xl border border-border bg-surface p-0 backdrop:bg-black/40"
+        className="m-auto w-full max-w-md rounded-2xl border border-border bg-surface p-0 backdrop:bg-black/40"
       >
         <form
           action={async (formData) => {
